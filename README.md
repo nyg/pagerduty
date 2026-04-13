@@ -1,36 +1,46 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# PagerDuty Incident Dashboard
+
+A real-time dashboard for monitoring PagerDuty incidents, built with Next.js, shadcn/ui, and Tailwind CSS.
+
+## Features
+
+- **Incident monitoring** — View triggered, acknowledged, and resolved incidents for your team
+- **Auto-refresh** — Configurable polling interval (default 30s) with countdown timer
+- **Real-time webhooks** — Optional ngrok-based webhook mode for instant updates via SSE
+- **Browser notifications** — Get notified of new incidents even when the tab is in the background
+- **Expandable alerts** — Drill into alerts for each incident on demand
+- **Pagination** — 30 incidents per page with navigation controls
+- **Dark/light mode** — Theme toggle with system preference detection
+- **Settings page** — Configure API token, team, polling interval, and ngrok URL
 
 ## Getting Started
 
-First, run the development server:
+1. Install dependencies: `npm install`
+2. Configure environment (optional): `cp .env.local.example .env.local`
+3. Run the development server: `npm run dev`
+4. Open http://localhost:3000 and configure your settings.
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+## Configuration
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Settings can be configured via:
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+- **Settings page** (`/settings`) — API token, team, poll interval, ngrok URL (persisted in localStorage)
+- **Environment variables** — `PAGERDUTY_API_TOKEN`, `NEXT_PUBLIC_PAGERDUTY_TEAM_ID`, etc.
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+## Webhook Mode
 
-## Learn More
+1. Start an ngrok tunnel: `ngrok http 3000`
+2. Enter the ngrok URL in Settings
+3. The app auto-creates a PagerDuty webhook subscription
+4. Incidents stream in real-time via Server-Sent Events
 
-To learn more about Next.js, take a look at the following resources:
+## Testing
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+`npm test`
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+## Tech Stack
 
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+- [Next.js](https://nextjs.org/) (App Router)
+- [shadcn/ui](https://ui.shadcn.com/) (Radix UI + Tailwind CSS)
+- [TypeScript](https://www.typescriptlang.org/)
+- [Vitest](https://vitest.dev/) for testing
