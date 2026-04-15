@@ -46,16 +46,14 @@ A systemd unit file is included to run the dashboard as a service on Linux.
    sudo chown pagerduty:pagerduty /opt/pagerduty
    ```
 
-2. Clone the repository directly into `/opt/pagerduty`, resolve the `pagerduty` user's npm path, and build:
+2. Clone the repository directly into `/opt/pagerduty` and build it as the `pagerduty` user:
 
    ```bash
    sudo -u pagerduty git clone https://github.com/nyg/pagerduty.git /opt/pagerduty
    cd /opt/pagerduty
-   NPM_BIN="$(sudo -u pagerduty bash -lc 'source \"$HOME/.nvm/nvm.sh\" 2>/dev/null; command -v npm')"
-   [ -n "$NPM_BIN" ] || { echo "npm not found for pagerduty user"; exit 1; }
-   sudo -u pagerduty "$NPM_BIN" ci
-   sudo -u pagerduty "$NPM_BIN" run build
-   sudo -u pagerduty "$NPM_BIN" prune --omit=dev
+   sudo -u pagerduty bash -lc 'source "$HOME/.nvm/nvm.sh" 2>/dev/null; npm ci'
+   sudo -u pagerduty bash -lc 'source "$HOME/.nvm/nvm.sh" 2>/dev/null; npm run build'
+   sudo -u pagerduty bash -lc 'source "$HOME/.nvm/nvm.sh" 2>/dev/null; npm prune --omit=dev'
    ```
 
 3. Copy your environment file:
@@ -68,10 +66,7 @@ A systemd unit file is included to run the dashboard as a service on Linux.
 4. Install and start the service:
 
    ```bash
-   NPM_BIN="$(sudo -u pagerduty bash -lc 'source \"$HOME/.nvm/nvm.sh\" 2>/dev/null; command -v npm')"
-   [ -n "$NPM_BIN" ] || { echo "npm not found for pagerduty user"; exit 1; }
    sudo cp pagerduty.service /etc/systemd/system/
-   sudo sed -i "s|^ExecStart=.*|ExecStart=$NPM_BIN start|" /etc/systemd/system/pagerduty.service
    sudo systemctl daemon-reload
    sudo systemctl enable pagerduty
    sudo systemctl start pagerduty
@@ -88,12 +83,10 @@ A systemd unit file is included to run the dashboard as a service on Linux.
 
    ```bash
    cd /opt/pagerduty
-   NPM_BIN="$(sudo -u pagerduty bash -lc 'source \"$HOME/.nvm/nvm.sh\" 2>/dev/null; command -v npm')"
-   [ -n "$NPM_BIN" ] || { echo "npm not found for pagerduty user"; exit 1; }
    sudo -u pagerduty git pull --ff-only
-   sudo -u pagerduty "$NPM_BIN" ci
-   sudo -u pagerduty "$NPM_BIN" run build
-   sudo -u pagerduty "$NPM_BIN" prune --omit=dev
+   sudo -u pagerduty bash -lc 'source "$HOME/.nvm/nvm.sh" 2>/dev/null; npm ci'
+   sudo -u pagerduty bash -lc 'source "$HOME/.nvm/nvm.sh" 2>/dev/null; npm run build'
+   sudo -u pagerduty bash -lc 'source "$HOME/.nvm/nvm.sh" 2>/dev/null; npm prune --omit=dev'
    sudo systemctl restart pagerduty
    ```
 
