@@ -46,14 +46,14 @@ A systemd unit file is included to run the dashboard as a service on Linux.
    sudo chown pagerduty:pagerduty /opt/pagerduty
    ```
 
-2. Clone the repository directly into `/opt/pagerduty` and build it:
+2. Install Node.js system-wide so `npm` is available at `/usr/bin/npm` (as used by `pagerduty.service`), then clone and build:
 
    ```bash
    sudo -u pagerduty git clone https://github.com/nyg/pagerduty.git /opt/pagerduty
    cd /opt/pagerduty
-   sudo -u pagerduty npm ci
-   sudo -u pagerduty npm run build
-   sudo -u pagerduty npm prune --omit=dev
+   sudo -u pagerduty /usr/bin/npm ci
+   sudo -u pagerduty /usr/bin/npm run build
+   sudo -u pagerduty /usr/bin/npm prune --omit=dev
    ```
 
 3. Copy your environment file:
@@ -84,9 +84,9 @@ A systemd unit file is included to run the dashboard as a service on Linux.
    ```bash
    cd /opt/pagerduty
    sudo -u pagerduty git pull --ff-only
-   sudo -u pagerduty npm ci
-   sudo -u pagerduty npm run build
-   sudo -u pagerduty npm prune --omit=dev
+   sudo -u pagerduty /usr/bin/npm ci
+   sudo -u pagerduty /usr/bin/npm run build
+   sudo -u pagerduty /usr/bin/npm prune --omit=dev
    sudo systemctl restart pagerduty
    ```
 
