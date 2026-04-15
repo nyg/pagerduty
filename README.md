@@ -51,9 +51,7 @@ A systemd unit file is included to run the dashboard as a service on Linux.
    ```bash
    sudo -u pagerduty git clone https://github.com/nyg/pagerduty.git /opt/pagerduty
    cd /opt/pagerduty
-   sudo -u pagerduty bash -lc 'source ~/.nvm/nvm.sh 2>/dev/null; npm ci'
-   sudo -u pagerduty bash -lc 'source ~/.nvm/nvm.sh 2>/dev/null; npm run build'
-   sudo -u pagerduty bash -lc 'source ~/.nvm/nvm.sh 2>/dev/null; npm prune --omit=dev'
+   sudo -u pagerduty bash -lc 'source ~/.nvm/nvm.sh 2>/dev/null; npm ci && npm run build && npm prune --omit=dev'
    ```
 
 3. Copy your environment file:
@@ -84,9 +82,7 @@ A systemd unit file is included to run the dashboard as a service on Linux.
    ```bash
    cd /opt/pagerduty
    sudo -u pagerduty git pull --ff-only
-   sudo -u pagerduty bash -lc 'source ~/.nvm/nvm.sh 2>/dev/null; npm ci'
-   sudo -u pagerduty bash -lc 'source ~/.nvm/nvm.sh 2>/dev/null; npm run build'
-   sudo -u pagerduty bash -lc 'source ~/.nvm/nvm.sh 2>/dev/null; npm prune --omit=dev'
+   sudo -u pagerduty bash -lc 'source ~/.nvm/nvm.sh 2>/dev/null; npm ci && npm run build && npm prune --omit=dev'
    sudo systemctl restart pagerduty
    ```
 
