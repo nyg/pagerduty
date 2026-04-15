@@ -34,6 +34,50 @@ Settings can be configured via:
 3. The app auto-creates a PagerDuty webhook subscription
 4. Incidents stream in real-time via Server-Sent Events
 
+## Linux Service (systemd)
+
+A systemd unit file is included to run the dashboard as a service on Linux.
+
+1. Create a dedicated user and install directory:
+
+   ```bash
+   sudo useradd -r -s /usr/sbin/nologin pagerduty
+   sudo mkdir -p /opt/pagerduty
+   sudo chown pagerduty:pagerduty /opt/pagerduty
+   ```
+
+2. Build the app and deploy it to `/opt/pagerduty` (or update `WorkingDirectory` in the unit file):
+
+   ```bash
+   npm install
+   npm run build
+   sudo cp -r .next package.json package-lock.json /opt/pagerduty/
+   cd /opt/pagerduty && sudo -u pagerduty npm ci --omit=dev
+   ```
+
+3. Copy your environment file:
+
+   ```bash
+   sudo cp .env.local /opt/pagerduty/.env.local
+   sudo chown pagerduty:pagerduty /opt/pagerduty/.env.local
+   ```
+
+4. Install and start the service:
+
+   ```bash
+   sudo cp pagerduty.service /etc/systemd/system/
+   sudo systemctl daemon-reload
+   sudo systemctl enable pagerduty
+   sudo systemctl start pagerduty
+   ```
+
+5. Check status and logs:
+
+   ```bash
+   sudo systemctl status pagerduty
+   journalctl -u pagerduty -f
+   ```
+
 ## Testing
 
 `npm test`
