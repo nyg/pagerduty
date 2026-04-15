@@ -13,7 +13,7 @@ export interface PagerDutyIncident {
     id: string;
     summary: string;
   };
-  assignees: Array<{
+  assignees?: Array<{
     id: string;
     summary: string;
   }>;

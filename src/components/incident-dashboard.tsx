@@ -162,7 +162,7 @@ export function IncidentDashboard() {
                     </TableCell>
                     <TableCell className="text-sm">
                       {incident.assignees
-                        .map((a) => a.summary)
+                        ?.map((a) => a.summary)
                         .join(", ") || "—"}
                     </TableCell>
                     <TableCell className="text-sm text-muted-foreground">
