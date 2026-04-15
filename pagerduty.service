@@ -8,7 +8,7 @@ User=pagerduty
 Group=pagerduty
 WorkingDirectory=/opt/pagerduty
 Environment=HOME=/home/pagerduty
-ExecStart=/bin/bash -c 'if [ -f "$HOME/.nvm/nvm.sh" ]; then source "$HOME/.nvm/nvm.sh"; fi; exec npm start'
+ExecStart=/bin/bash -c 'if [ -f "$HOME/.nvm/nvm.sh" ]; then source "$HOME/.nvm/nvm.sh"; fi; command -v npm >/dev/null || { echo "npm not found for pagerduty user"; exit 1; }; exec npm start'
 Restart=on-failure
 RestartSec=10
 StandardOutput=journal
