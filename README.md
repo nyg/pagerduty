@@ -46,13 +46,14 @@ A systemd unit file is included to run the dashboard as a service on Linux.
    sudo chown pagerduty:pagerduty /opt/pagerduty
    ```
 
-2. Build the app and deploy it to `/opt/pagerduty` (or update `WorkingDirectory` in the unit file):
+2. Clone the repository directly into `/opt/pagerduty` and build it:
 
    ```bash
-   npm install
-   npm run build
-   sudo cp -r .next package.json package-lock.json /opt/pagerduty/
-   cd /opt/pagerduty && sudo -u pagerduty npm ci --omit=dev
+   sudo -u pagerduty git clone https://github.com/nyg/pagerduty.git /opt/pagerduty
+   cd /opt/pagerduty
+   sudo -u pagerduty npm ci
+   sudo -u pagerduty npm run build
+   sudo -u pagerduty npm prune --omit=dev
    ```
 
 3. Copy your environment file:
@@ -77,6 +78,19 @@ A systemd unit file is included to run the dashboard as a service on Linux.
    sudo systemctl status pagerduty
    journalctl -u pagerduty -f
    ```
+
+6. Update the app later:
+
+   ```bash
+   cd /opt/pagerduty
+   sudo -u pagerduty git pull --ff-only
+   sudo -u pagerduty npm ci
+   sudo -u pagerduty npm run build
+   sudo -u pagerduty npm prune --omit=dev
+   sudo systemctl restart pagerduty
+   ```
+
+   If `git pull --ff-only` fails, resolve local changes or reset the checkout before retrying.
 
 ## Testing
 
