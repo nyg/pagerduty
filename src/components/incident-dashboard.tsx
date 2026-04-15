@@ -23,6 +23,8 @@ import { AlertList } from "@/components/alert-list";
 import { CountdownTimer } from "@/components/countdown-timer";
 import { PaginationControls } from "@/components/pagination-controls";
 
+const INCIDENT_TABLE_COLUMN_COUNT = 7;
+
 export function IncidentDashboard() {
   const { incidents, loading, error, total, page, setPage, getNewIncidentIds, markNotified } =
     useIncidents();
@@ -122,14 +124,17 @@ export function IncidentDashboard() {
             <TableBody>
               {loading && incidents.length === 0 ? (
                 <TableRow>
-                  <TableCell colSpan={7} className="h-32 text-center">
+                  <TableCell
+                    colSpan={INCIDENT_TABLE_COLUMN_COUNT}
+                    className="h-32 text-center"
+                  >
                     <Loader2 className="mx-auto h-6 w-6 animate-spin text-muted-foreground" />
                   </TableCell>
                 </TableRow>
               ) : incidents.length === 0 ? (
                 <TableRow>
                   <TableCell
-                    colSpan={7}
+                    colSpan={INCIDENT_TABLE_COLUMN_COUNT}
                     className="h-32 text-center text-muted-foreground"
                   >
                     No incidents found
@@ -174,7 +179,10 @@ export function IncidentDashboard() {
                       </TableCell>
                     </TableRow>
                     <TableRow>
-                      <TableCell colSpan={7} className="pt-0">
+                      <TableCell
+                        colSpan={INCIDENT_TABLE_COLUMN_COUNT}
+                        className="pt-0"
+                      >
                         <AlertList incidentId={incident.id} />
                       </TableCell>
                     </TableRow>
