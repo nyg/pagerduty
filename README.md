@@ -41,7 +41,7 @@ A systemd unit file is included to run the dashboard as a service on Linux.
 1. Create a dedicated user and install directory:
 
    ```bash
-   sudo useradd -r -s /usr/sbin/nologin pagerduty
+   sudo useradd -r -m -d /home/pagerduty -s /usr/sbin/nologin pagerduty
    sudo mkdir -p /opt/pagerduty
    sudo chown pagerduty:pagerduty /opt/pagerduty
    ```
@@ -51,7 +51,7 @@ A systemd unit file is included to run the dashboard as a service on Linux.
    ```bash
    sudo -u pagerduty git clone https://github.com/nyg/pagerduty.git /opt/pagerduty
    cd /opt/pagerduty
-   sudo -u pagerduty bash -lc 'source ~/.nvm/nvm.sh 2>/dev/null; npm ci && npm run build && npm prune --omit=dev'
+   sudo -u pagerduty bash -lc 'if [ -f ~/.nvm/nvm.sh ]; then source ~/.nvm/nvm.sh; fi; command -v npm >/dev/null || { echo "npm not found for pagerduty user"; exit 1; }; npm ci && npm run build && npm prune --omit=dev'
    ```
 
 3. Copy your environment file:
@@ -82,7 +82,7 @@ A systemd unit file is included to run the dashboard as a service on Linux.
    ```bash
    cd /opt/pagerduty
    sudo -u pagerduty git pull --ff-only
-   sudo -u pagerduty bash -lc 'source ~/.nvm/nvm.sh 2>/dev/null; npm ci && npm run build && npm prune --omit=dev'
+   sudo -u pagerduty bash -lc 'if [ -f ~/.nvm/nvm.sh ]; then source ~/.nvm/nvm.sh; fi; command -v npm >/dev/null || { echo "npm not found for pagerduty user"; exit 1; }; npm ci && npm run build && npm prune --omit=dev'
    sudo systemctl restart pagerduty
    ```
 
