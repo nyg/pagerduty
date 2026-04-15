@@ -7,6 +7,20 @@ import type { PagerDutyIncident, WebhookEvent } from "@/lib/types";
 
 function webhookEventToIncident(event: WebhookEvent): PagerDutyIncident {
   const d = event.event.data;
+  const resolvedBy =
+    (
+      d as WebhookEvent["event"]["data"] & {
+        resolved_by_user?: { id: string; summary: string };
+        last_status_change_by?: { id: string; summary: string };
+      }
+    ).resolved_by_user ??
+    (
+      d as WebhookEvent["event"]["data"] & {
+        resolved_by_user?: { id: string; summary: string };
+        last_status_change_by?: { id: string; summary: string };
+      }
+    ).last_status_change_by;
+
   return {
     id: d.id,
     incident_number: d.number,
@@ -18,6 +32,7 @@ function webhookEventToIncident(event: WebhookEvent): PagerDutyIncident {
     html_url: d.html_url,
     service: d.service,
     assignees: d.assignees ?? [],
+    resolved_by: resolvedBy,
     teams: d.teams ?? [],
   };
 }

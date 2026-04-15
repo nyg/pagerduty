@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect } from "react";
+import { Fragment, useEffect } from "react";
 import { RefreshCw, Loader2, AlertCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -115,8 +115,8 @@ export function IncidentDashboard() {
                 <TableHead>Title</TableHead>
                 <TableHead>Service</TableHead>
                 <TableHead>Assignee</TableHead>
+                <TableHead>Resolved by</TableHead>
                 <TableHead className="w-[160px]">Created</TableHead>
-                <TableHead className="w-[100px]">Alerts</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
@@ -137,41 +137,48 @@ export function IncidentDashboard() {
                 </TableRow>
               ) : (
                 incidents.map((incident) => (
-                  <TableRow key={incident.id}>
-                    <TableCell>
-                      <StatusBadge status={incident.status} />
-                    </TableCell>
-                    <TableCell>
-                      <UrgencyBadge urgency={incident.urgency} />
-                    </TableCell>
-                    <TableCell>
-                      <a
-                        href={incident.html_url}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="font-medium hover:underline"
-                      >
-                        {incident.title}
-                      </a>
-                      <p className="text-xs text-muted-foreground">
-                        #{incident.incident_number}
-                      </p>
-                    </TableCell>
-                    <TableCell className="text-sm">
-                      {incident.service.summary}
-                    </TableCell>
-                    <TableCell className="text-sm">
-                      {incident.assignees
-                        ?.map((a) => a.summary)
-                        .join(", ") || "—"}
-                    </TableCell>
-                    <TableCell className="text-sm text-muted-foreground">
-                      {new Date(incident.created_at).toLocaleString()}
-                    </TableCell>
-                    <TableCell>
-                      <AlertList incidentId={incident.id} />
-                    </TableCell>
-                  </TableRow>
+                  <Fragment key={incident.id}>
+                    <TableRow>
+                      <TableCell>
+                        <StatusBadge status={incident.status} />
+                      </TableCell>
+                      <TableCell>
+                        <UrgencyBadge urgency={incident.urgency} />
+                      </TableCell>
+                      <TableCell>
+                        <a
+                          href={incident.html_url}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="font-medium hover:underline"
+                        >
+                          {incident.title}
+                        </a>
+                        <p className="text-xs text-muted-foreground">
+                          #{incident.incident_number}
+                        </p>
+                      </TableCell>
+                      <TableCell className="text-sm">
+                        {incident.service.summary}
+                      </TableCell>
+                      <TableCell className="text-sm">
+                        {incident.assignees
+                          ?.map((a) => a.summary)
+                          .join(", ") || "—"}
+                      </TableCell>
+                      <TableCell className="text-sm">
+                        {incident.resolved_by?.summary || "—"}
+                      </TableCell>
+                      <TableCell className="text-sm text-muted-foreground">
+                        {new Date(incident.created_at).toLocaleString()}
+                      </TableCell>
+                    </TableRow>
+                    <TableRow>
+                      <TableCell colSpan={7} className="pt-0">
+                        <AlertList incidentId={incident.id} />
+                      </TableCell>
+                    </TableRow>
+                  </Fragment>
                 ))
               )}
             </TableBody>

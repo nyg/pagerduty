@@ -17,6 +17,10 @@ export interface PagerDutyIncident {
     id: string;
     summary: string;
   }>;
+  resolved_by?: {
+    id: string;
+    summary: string;
+  };
   teams: Array<{
     id: string;
     summary: string;

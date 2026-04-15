@@ -58,11 +58,11 @@ export function AlertList({ incidentId }: AlertListProps) {
         ) : (
           <ChevronRight className="h-4 w-4" />
         )}
-        <span>Alerts</span>
+        <span>{open ? "Hide alerts" : "Show alerts"}</span>
         {loading && <Loader2 className="h-3 w-3 animate-spin" />}
       </CollapsibleTrigger>
       <CollapsibleContent>
-        <div className="mt-2 space-y-2 pl-5">
+        <div className="mt-2 space-y-2 pl-6">
           {error && (
             <p className="text-sm text-destructive">{error}</p>
           )}

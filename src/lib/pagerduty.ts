@@ -64,15 +64,56 @@ export async function listIncidents(
   searchParams.set("limit", String(params.limit ?? 30));
   searchParams.set("offset", String(params.offset ?? 0));
   searchParams.set("sort_by", "created_at:desc");
+  searchParams.append("include[]", "assignments");
+  searchParams.append("include[]", "last_status_change_by");
 
   const res = await pdFetch(
     `/incidents?${searchParams.toString()}`,
     apiToken
   );
   const json = await res.json();
+  const incidents = (json.incidents ?? []).map(
+    (incident: PagerDutyIncident & {
+      assignments?: Array<{
+        assignee?: {
+          id: string;
+          summary: string;
+        };
+      }>;
+      last_status_change_by?: {
+        id: string;
+        summary: string;
+      };
+      resolved_by_user?: {
+        id: string;
+        summary: string;
+      };
+    }) => {
+      const assignees =
+        incident.assignees && incident.assignees.length > 0
+          ? incident.assignees
+          : (incident.assignments ?? [])
+              .map((assignment) => assignment.assignee)
+              .filter((assignee): assignee is { id: string; summary: string } =>
+                Boolean(assignee)
+              );
+
+      const resolvedBy =
+        incident.resolved_by_user ??
+        (incident.status === "resolved"
+          ? incident.last_status_change_by
+          : undefined);
+
+      return {
+        ...incident,
+        assignees,
+        resolved_by: resolvedBy,
+      };
+    }
+  );
 
   return {
-    data: json.incidents ?? [],
+    data: incidents,
     limit: json.limit ?? 30,
     offset: json.offset ?? 0,
     total: json.total ?? 0,
