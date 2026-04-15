@@ -34,7 +34,7 @@ function webhookEventToIncident(event: WebhookEvent): PagerDutyIncident {
 
 export function useWebhookStream() {
   const { isWebhookMode, config, isConfigured } = useConfig();
-  const { upsertIncident, setIncidents, setLoading, setError, page } =
+  const { upsertIncident, setIncidents, setLoading, setError, page, pageSize } =
     useIncidents();
   const eventSourceRef = useRef<EventSource | null>(null);
 
@@ -46,8 +46,8 @@ export function useWebhookStream() {
       const params = new URLSearchParams({
         teamId: config.teamId,
         apiToken: config.apiToken,
-        limit: "30",
-        offset: String(page * 30),
+        limit: String(pageSize),
+        offset: String(page * pageSize),
         statuses: "triggered,acknowledged,resolved",
       });
       const res = await fetch(`/api/incidents?${params.toString()}`);
@@ -59,7 +59,7 @@ export function useWebhookStream() {
         err instanceof Error ? err.message : "Failed to fetch incidents"
       );
     }
-  }, [isConfigured, config.teamId, config.apiToken, page, setIncidents, setLoading, setError]);
+  }, [isConfigured, config.teamId, config.apiToken, page, pageSize, setIncidents, setLoading, setError]);
 
   useEffect(() => {
     if (!isWebhookMode) {

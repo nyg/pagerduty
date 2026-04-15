@@ -1,7 +1,7 @@
 "use client";
 
-import { Fragment, useEffect } from "react";
-import { RefreshCw, Loader2, AlertCircle } from "lucide-react";
+import { Fragment, useEffect, useState } from "react";
+import { RefreshCw, Loader2, AlertCircle, Plus, Minus } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import {
@@ -12,6 +12,13 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { useIncidents } from "@/contexts/incident-context";
 import { useConfig } from "@/contexts/config-context";
@@ -23,15 +30,27 @@ import { AlertList } from "@/components/alert-list";
 import { CountdownTimer } from "@/components/countdown-timer";
 import { PaginationControls } from "@/components/pagination-controls";
 
-const INCIDENT_TABLE_COLUMN_COUNT = 7;
+const INCIDENT_TABLE_COLUMN_COUNT = 6;
+const PAGE_SIZE_OPTIONS = [10, 20, 30, 50, 100];
 
 export function IncidentDashboard() {
-  const { incidents, loading, error, total, page, setPage, getNewIncidentIds, markNotified } =
-    useIncidents();
+  const {
+    incidents,
+    loading,
+    error,
+    total,
+    page,
+    pageSize,
+    setPage,
+    setPageSize,
+    getNewIncidentIds,
+    markNotified,
+  } = useIncidents();
   const { isConfigured } = useConfig();
   const { secondsUntilRefresh, pollInterval, isPolling, refresh } =
     useIncidentPolling();
   const { notify } = useNotifications();
+  const [expandedIds, setExpandedIds] = useState<Set<string>>(new Set());
 
   // Connect webhook SSE stream
   useWebhookStream();
@@ -46,6 +65,18 @@ export function IncidentDashboard() {
       markNotified(newIds);
     }
   }, [incidents, getNewIncidentIds, markNotified, notify]);
+
+  const toggleExpand = (id: string) => {
+    setExpandedIds((prev) => {
+      const next = new Set(prev);
+      if (next.has(id)) {
+        next.delete(id);
+      } else {
+        next.add(id);
+      }
+      return next;
+    });
+  };
 
   if (!isConfigured) {
     return (
@@ -68,7 +99,7 @@ export function IncidentDashboard() {
 
   return (
     <TooltipProvider>
-      <div className="space-y-4">
+      <div className="w-full space-y-4 px-4">
         {/* Toolbar */}
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-4">
@@ -78,6 +109,21 @@ export function IncidentDashboard() {
             </span>
           </div>
           <div className="flex items-center gap-3">
+            <Select
+              value={String(pageSize)}
+              onValueChange={(v) => setPageSize(Number(v))}
+            >
+              <SelectTrigger size="sm">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                {PAGE_SIZE_OPTIONS.map((size) => (
+                  <SelectItem key={size} value={String(size)}>
+                    {size} / page
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
             <CountdownTimer
               seconds={secondsUntilRefresh}
               total={pollInterval}
@@ -109,16 +155,15 @@ export function IncidentDashboard() {
 
         {/* Table */}
         <Card>
-          <Table>
+          <Table className="w-full">
             <TableHeader>
               <TableRow>
+                <TableHead className="w-10" />
                 <TableHead className="w-[100px]">Status</TableHead>
                 <TableHead className="w-[80px]">Urgency</TableHead>
-                <TableHead>Title</TableHead>
                 <TableHead>Service</TableHead>
-                <TableHead>Assignee</TableHead>
                 <TableHead>Resolved by</TableHead>
-                <TableHead className="w-[160px]">Created</TableHead>
+                <TableHead>Title</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
@@ -144,11 +189,31 @@ export function IncidentDashboard() {
                 incidents.map((incident) => (
                   <Fragment key={incident.id}>
                     <TableRow>
+                      <TableCell className="w-10 px-2">
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          className="h-6 w-6"
+                          onClick={() => toggleExpand(incident.id)}
+                        >
+                          {expandedIds.has(incident.id) ? (
+                            <Minus className="h-4 w-4" />
+                          ) : (
+                            <Plus className="h-4 w-4" />
+                          )}
+                        </Button>
+                      </TableCell>
                       <TableCell>
                         <StatusBadge status={incident.status} />
                       </TableCell>
                       <TableCell>
                         <UrgencyBadge urgency={incident.urgency} />
+                      </TableCell>
+                      <TableCell className="text-sm">
+                        {incident.service.summary}
+                      </TableCell>
+                      <TableCell className="text-sm">
+                        {incident.resolved_by?.summary || "—"}
                       </TableCell>
                       <TableCell>
                         <a
@@ -163,29 +228,17 @@ export function IncidentDashboard() {
                           #{incident.incident_number}
                         </p>
                       </TableCell>
-                      <TableCell className="text-sm">
-                        {incident.service.summary}
-                      </TableCell>
-                      <TableCell className="text-sm">
-                        {incident.assignees
-                          ?.map((a) => a.summary)
-                          .join(", ") || "—"}
-                      </TableCell>
-                      <TableCell className="text-sm">
-                        {incident.resolved_by?.summary || "—"}
-                      </TableCell>
-                      <TableCell className="text-sm text-muted-foreground">
-                        {new Date(incident.created_at).toLocaleString()}
-                      </TableCell>
                     </TableRow>
-                    <TableRow>
-                      <TableCell
-                        colSpan={INCIDENT_TABLE_COLUMN_COUNT}
-                        className="pt-0"
-                      >
-                        <AlertList incidentId={incident.id} />
-                      </TableCell>
-                    </TableRow>
+                    {expandedIds.has(incident.id) && (
+                      <TableRow>
+                        <TableCell
+                          colSpan={INCIDENT_TABLE_COLUMN_COUNT}
+                          className="bg-muted/30 p-0"
+                        >
+                          <AlertList incidentId={incident.id} />
+                        </TableCell>
+                      </TableRow>
+                    )}
                   </Fragment>
                 ))
               )}
@@ -194,7 +247,7 @@ export function IncidentDashboard() {
           <PaginationControls
             page={page}
             total={total}
-            pageSize={30}
+            pageSize={pageSize}
             onPageChange={setPage}
           />
         </Card>

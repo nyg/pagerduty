@@ -4,11 +4,9 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { useConfig } from "@/contexts/config-context";
 import { useIncidents } from "@/contexts/incident-context";
 
-const PAGE_SIZE = 30;
-
 export function useIncidentPolling() {
   const { config, isConfigured, isWebhookMode } = useConfig();
-  const { setIncidents, setLoading, setError, page } = useIncidents();
+  const { setIncidents, setLoading, setError, page, pageSize } = useIncidents();
   const [secondsUntilRefresh, setSecondsUntilRefresh] = useState(
     config.pollInterval
   );
@@ -24,8 +22,8 @@ export function useIncidentPolling() {
       const params = new URLSearchParams({
         teamId: config.teamId,
         apiToken: config.apiToken,
-        limit: String(PAGE_SIZE),
-        offset: String(page * PAGE_SIZE),
+        limit: String(pageSize),
+        offset: String(page * pageSize),
         statuses: "triggered,acknowledged,resolved",
       });
 
@@ -44,7 +42,7 @@ export function useIncidentPolling() {
         setError(err instanceof Error ? err.message : "Failed to fetch incidents");
       }
     }
-  }, [isConfigured, config.teamId, config.apiToken, page, setIncidents, setLoading, setError]);
+  }, [isConfigured, config.teamId, config.apiToken, page, pageSize, setIncidents, setLoading, setError]);
 
   const resetCountdown = useCallback(() => {
     setSecondsUntilRefresh(config.pollInterval);
