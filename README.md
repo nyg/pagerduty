@@ -51,7 +51,7 @@ A systemd unit file is included to run the dashboard as a service on Linux.
    ```bash
    sudo -u pagerduty git clone https://github.com/nyg/pagerduty.git /opt/pagerduty
    cd /opt/pagerduty
-   NPM_BIN="$(sudo -iu pagerduty bash -lc 'command -v npm')"
+   NPM_BIN="$(sudo -u pagerduty bash -lc 'source \"$HOME/.nvm/nvm.sh\" 2>/dev/null; command -v npm')"
    [ -n "$NPM_BIN" ] || { echo "npm not found for pagerduty user"; exit 1; }
    sudo -u pagerduty "$NPM_BIN" ci
    sudo -u pagerduty "$NPM_BIN" run build
@@ -68,7 +68,7 @@ A systemd unit file is included to run the dashboard as a service on Linux.
 4. Install and start the service:
 
    ```bash
-   NPM_BIN="$(sudo -iu pagerduty bash -lc 'command -v npm')"
+   NPM_BIN="$(sudo -u pagerduty bash -lc 'source \"$HOME/.nvm/nvm.sh\" 2>/dev/null; command -v npm')"
    [ -n "$NPM_BIN" ] || { echo "npm not found for pagerduty user"; exit 1; }
    sudo cp pagerduty.service /etc/systemd/system/
    sudo sed -i "s|^ExecStart=.*|ExecStart=$NPM_BIN start|" /etc/systemd/system/pagerduty.service
@@ -88,7 +88,7 @@ A systemd unit file is included to run the dashboard as a service on Linux.
 
    ```bash
    cd /opt/pagerduty
-   NPM_BIN="$(sudo -iu pagerduty bash -lc 'command -v npm')"
+   NPM_BIN="$(sudo -u pagerduty bash -lc 'source \"$HOME/.nvm/nvm.sh\" 2>/dev/null; command -v npm')"
    [ -n "$NPM_BIN" ] || { echo "npm not found for pagerduty user"; exit 1; }
    sudo -u pagerduty git pull --ff-only
    sudo -u pagerduty "$NPM_BIN" ci
