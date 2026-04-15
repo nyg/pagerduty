@@ -1,0 +1,19 @@
+[Unit]
+Description=PagerDuty Incident Dashboard
+After=network.target
+
+[Service]
+Type=simple
+User=pagerduty
+Group=pagerduty
+WorkingDirectory=/opt/pagerduty
+ExecStart=/usr/bin/npm start
+Restart=on-failure
+RestartSec=10
+StandardOutput=journal
+StandardError=journal
+SyslogIdentifier=pagerduty
+EnvironmentFile=-/opt/pagerduty/.env.local
+
+[Install]
+WantedBy=multi-user.target
