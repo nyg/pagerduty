@@ -27,6 +27,7 @@ export async function GET(
         { status: err.status }
       );
     }
+    console.error("Failed to fetch alerts:", err);
     return NextResponse.json(
       { error: "Failed to fetch alerts" },
       { status: 500 }

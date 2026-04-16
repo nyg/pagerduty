@@ -12,6 +12,11 @@ import { type AppConfig, DEFAULT_CONFIG } from "@/lib/types";
 
 const STORAGE_KEY = "pagerduty-config";
 
+interface ServerConfig {
+  hasServerToken: boolean;
+  teamId: string;
+}
+
 interface ConfigContextValue {
   config: AppConfig;
   updateConfig: (updates: Partial<AppConfig>) => void;
@@ -50,11 +55,30 @@ function loadConfig(): AppConfig {
 
 export function ConfigProvider({ children }: { children: ReactNode }) {
   const [config, setConfig] = useState<AppConfig>(DEFAULT_CONFIG);
+  const [serverConfig, setServerConfig] = useState<ServerConfig>({
+    hasServerToken: false,
+    teamId: "",
+  });
   const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
-    setConfig(loadConfig());
-    setMounted(true);
+    const loaded = loadConfig();
+
+    fetch("/api/config")
+      .then((res) => res.json())
+      .then((data: ServerConfig) => {
+        setServerConfig(data);
+        // Apply server-side teamId if client doesn't have one
+        if (data.teamId && !loaded.teamId) {
+          loaded.teamId = data.teamId;
+        }
+        setConfig(loaded);
+        setMounted(true);
+      })
+      .catch(() => {
+        setConfig(loaded);
+        setMounted(true);
+      });
   }, []);
 
   const updateConfig = useCallback((updates: Partial<AppConfig>) => {
@@ -69,7 +93,7 @@ export function ConfigProvider({ children }: { children: ReactNode }) {
     });
   }, []);
 
-  const isConfigured = !!(config.apiToken && config.teamId);
+  const isConfigured = !!(config.apiToken || serverConfig.hasServerToken) && !!config.teamId;
   const isWebhookMode = !!(
     config.ngrokUrl && config.webhookSubscriptionId
   );

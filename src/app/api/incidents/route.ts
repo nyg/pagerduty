@@ -5,7 +5,7 @@ export async function GET(request: NextRequest) {
   const params = request.nextUrl.searchParams;
   const apiToken =
     params.get("apiToken") || process.env.PAGERDUTY_API_TOKEN || "";
-  const teamId = params.get("teamId") || "";
+  const teamId = params.get("teamId") || process.env.PAGERDUTY_TEAM_ID || "";
   const limit = Number(params.get("limit") || "30");
   const offset = Number(params.get("offset") || "0");
   const statuses = params.get("statuses")?.split(",") || [
@@ -36,6 +36,7 @@ export async function GET(request: NextRequest) {
         { status: err.status }
       );
     }
+    console.error("Failed to fetch incidents:", err);
     return NextResponse.json(
       { error: "Failed to fetch incidents" },
       { status: 500 }

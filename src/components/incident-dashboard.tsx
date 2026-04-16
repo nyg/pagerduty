@@ -30,7 +30,7 @@ import { AlertList } from "@/components/alert-list";
 import { CountdownTimer } from "@/components/countdown-timer";
 import { PaginationControls } from "@/components/pagination-controls";
 
-const INCIDENT_TABLE_COLUMN_COUNT = 6;
+const INCIDENT_TABLE_COLUMN_COUNT = 7;
 const PAGE_SIZE_OPTIONS = [10, 20, 30, 50, 100];
 
 export function IncidentDashboard() {
@@ -109,21 +109,6 @@ export function IncidentDashboard() {
             </span>
           </div>
           <div className="flex items-center gap-3">
-            <Select
-              value={String(pageSize)}
-              onValueChange={(v) => setPageSize(Number(v))}
-            >
-              <SelectTrigger size="sm">
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent>
-                {PAGE_SIZE_OPTIONS.map((size) => (
-                  <SelectItem key={size} value={String(size)}>
-                    {size} / page
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
             <CountdownTimer
               seconds={secondsUntilRefresh}
               total={pollInterval}
@@ -142,6 +127,21 @@ export function IncidentDashboard() {
               )}
               Refresh
             </Button>
+            <Select
+              value={String(pageSize)}
+              onValueChange={(v) => setPageSize(Number(v))}
+            >
+              <SelectTrigger size="sm">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                {PAGE_SIZE_OPTIONS.map((size) => (
+                  <SelectItem key={size} value={String(size)}>
+                    {size} / page
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
           </div>
         </div>
 
@@ -159,6 +159,7 @@ export function IncidentDashboard() {
             <TableHeader>
               <TableRow>
                 <TableHead className="w-10" />
+                <TableHead className="w-[160px]">Created</TableHead>
                 <TableHead className="w-[100px]">Status</TableHead>
                 <TableHead className="w-[80px]">Urgency</TableHead>
                 <TableHead>Service</TableHead>
@@ -202,6 +203,9 @@ export function IncidentDashboard() {
                             <Plus className="h-4 w-4" />
                           )}
                         </Button>
+                      </TableCell>
+                      <TableCell className="text-sm text-muted-foreground whitespace-nowrap">
+                        {new Date(incident.created_at).toLocaleString()}
                       </TableCell>
                       <TableCell>
                         <StatusBadge status={incident.status} />

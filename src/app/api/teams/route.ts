@@ -23,6 +23,7 @@ export async function GET(request: NextRequest) {
         { status: err.status }
       );
     }
+    console.error("Failed to fetch teams:", err);
     return NextResponse.json(
       { error: "Failed to fetch teams" },
       { status: 500 }
