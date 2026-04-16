@@ -36,6 +36,7 @@ export async function GET(request: NextRequest) {
         { status: err.status }
       );
     }
+    console.error("Failed to fetch incidents:", err);
     return NextResponse.json(
       { error: "Failed to fetch incidents" },
       { status: 500 }

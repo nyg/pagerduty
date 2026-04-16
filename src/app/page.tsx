@@ -7,7 +7,7 @@ export default function HomePage() {
     <>
       <Header />
       <NotificationBanner />
-      <main className="container mx-auto flex-1 px-4 py-6">
+      <main className="flex-1 px-6 py-6">
         <IncidentDashboard />
       </main>
     </>

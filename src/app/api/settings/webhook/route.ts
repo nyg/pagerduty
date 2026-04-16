@@ -46,6 +46,7 @@ export async function POST(request: NextRequest) {
         { status: err.status }
       );
     }
+    console.error("Failed to manage webhook subscription:", err);
     return NextResponse.json(
       { error: "Failed to manage webhook subscription" },
       { status: 500 }

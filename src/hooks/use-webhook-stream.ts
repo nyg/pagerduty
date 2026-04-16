@@ -7,6 +7,15 @@ import type { PagerDutyIncident, WebhookEvent } from "@/lib/types";
 
 function webhookEventToIncident(event: WebhookEvent): PagerDutyIncident {
   const d = event.event.data;
+  type IncidentWithResolver = WebhookEvent["event"]["data"] & {
+    resolved_by_user?: { id: string; summary: string };
+    last_status_change_by?: { id: string; summary: string };
+  };
+  const incidentWithResolver = d as IncidentWithResolver;
+  const resolvedBy =
+    incidentWithResolver.resolved_by_user ??
+    incidentWithResolver.last_status_change_by;
+
   return {
     id: d.id,
     incident_number: d.number,
@@ -18,13 +27,14 @@ function webhookEventToIncident(event: WebhookEvent): PagerDutyIncident {
     html_url: d.html_url,
     service: d.service,
     assignees: d.assignees ?? [],
+    resolved_by: resolvedBy,
     teams: d.teams ?? [],
   };
 }
 
 export function useWebhookStream() {
   const { isWebhookMode, config, isConfigured } = useConfig();
-  const { upsertIncident, setIncidents, setLoading, setError, page } =
+  const { upsertIncident, setIncidents, setLoading, setError, page, pageSize } =
     useIncidents();
   const eventSourceRef = useRef<EventSource | null>(null);
 
@@ -36,8 +46,8 @@ export function useWebhookStream() {
       const params = new URLSearchParams({
         teamId: config.teamId,
         apiToken: config.apiToken,
-        limit: "30",
-        offset: String(page * 30),
+        limit: String(pageSize),
+        offset: String(page * pageSize),
         statuses: "triggered,acknowledged,resolved",
       });
       const res = await fetch(`/api/incidents?${params.toString()}`);
@@ -49,7 +59,7 @@ export function useWebhookStream() {
         err instanceof Error ? err.message : "Failed to fetch incidents"
       );
     }
-  }, [isConfigured, config.teamId, config.apiToken, page, setIncidents, setLoading, setError]);
+  }, [isConfigured, config.teamId, config.apiToken, page, pageSize, setIncidents, setLoading, setError]);
 
   useEffect(() => {
     if (!isWebhookMode) {

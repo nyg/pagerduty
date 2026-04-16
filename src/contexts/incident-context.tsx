@@ -17,6 +17,7 @@ interface IncidentState {
   total: number;
   offset: number;
   page: number;
+  pageSize: number;
 }
 
 interface IncidentContextValue extends IncidentState {
@@ -29,6 +30,7 @@ interface IncidentContextValue extends IncidentState {
   setLoading: (loading: boolean) => void;
   setError: (error: string | null) => void;
   setPage: (page: number) => void;
+  setPageSize: (size: number) => void;
   getNewIncidentIds: (incidents: PagerDutyIncident[]) => string[];
   markNotified: (ids: string[]) => void;
 }
@@ -43,6 +45,7 @@ export function IncidentProvider({ children }: { children: ReactNode }) {
     total: 0,
     offset: 0,
     page: 0,
+    pageSize: 30,
   });
 
   const notifiedRef = useRef<Set<string>>(new Set());
@@ -103,6 +106,10 @@ export function IncidentProvider({ children }: { children: ReactNode }) {
     setState((prev) => ({ ...prev, page }));
   }, []);
 
+  const setPageSize = useCallback((pageSize: number) => {
+    setState((prev) => ({ ...prev, pageSize, page: 0 }));
+  }, []);
+
   const getNewIncidentIds = useCallback(
     (incidents: PagerDutyIncident[]) => {
       return incidents
@@ -125,6 +132,7 @@ export function IncidentProvider({ children }: { children: ReactNode }) {
         setLoading,
         setError,
         setPage,
+        setPageSize,
         getNewIncidentIds,
         markNotified,
       }}

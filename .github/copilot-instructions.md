@@ -26,6 +26,10 @@ PagerDuty Incident Dashboard — a real-time dashboard for monitoring PagerDuty 
 src/
 ├── app/              # Next.js App Router pages and API routes
 │   ├── api/          # API route handlers
+│   │   ├── config/   # Server-side config status endpoint
+│   │   ├── incidents/ # Incident listing and alert details
+│   │   ├── settings/ # Webhook subscription management
+│   │   └── teams/    # Team listing
 │   ├── settings/     # Settings page
 │   ├── layout.tsx    # Root layout
 │   └── page.tsx      # Home page
@@ -49,3 +53,4 @@ src/
 - The systemd service file (`pagerduty.service`) assumes npm is available at `/usr/bin/npm`.
 - Deployment uses a project-level `.npmrc` (with `cafile=` and `cache=/var/cache/npm-pagerduty`) so the `pagerduty` system user can run npm without a home directory.
 - Use `update.sh` to pull and rebuild the production deployment.
+- Server-side env var `PAGERDUTY_API_TOKEN` is used by API routes and is not exposed to the browser. The `/api/config` endpoint lets the client know whether a server token is available.

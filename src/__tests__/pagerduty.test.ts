@@ -52,6 +52,8 @@ describe("PagerDuty API Client", () => {
       expect(url).toContain("team_ids%5B%5D=TEAM1");
       expect(url).toContain("statuses%5B%5D=triggered");
       expect(url).toContain("statuses%5B%5D=acknowledged");
+      expect(url).toContain("include%5B%5D=assignments");
+      expect(url).toContain("include%5B%5D=last_status_change_by");
       expect(url).toContain("limit=30");
       expect(url).toContain("offset=0");
       expect(init.headers).toHaveProperty(
@@ -65,6 +67,41 @@ describe("PagerDuty API Client", () => {
       expect(result.data).toHaveLength(1);
       expect(result.data[0].id).toBe("P1");
       expect(result.total).toBe(1);
+    });
+
+    it("maps assignments and resolver references", async () => {
+      mockFetch.mockResolvedValueOnce({
+        ok: true,
+        json: async () => ({
+          incidents: [
+            {
+              id: "P1",
+              title: "Resolved incident",
+              status: "resolved",
+              urgency: "high",
+              assignments: [
+                {
+                  assignee: { id: "U1", summary: "User One" },
+                },
+              ],
+              last_status_change_by: { id: "U2", summary: "Resolver User" },
+            },
+          ],
+          limit: 30,
+          offset: 0,
+          total: 1,
+          more: false,
+        }),
+      });
+
+      const result = await pd.listIncidents("test-token", {});
+      expect(result.data[0].assignees).toEqual([
+        { id: "U1", summary: "User One" },
+      ]);
+      expect(result.data[0].resolved_by).toEqual({
+        id: "U2",
+        summary: "Resolver User",
+      });
     });
 
     it("uses default limit and offset when not provided", async () => {
