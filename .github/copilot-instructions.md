@@ -47,3 +47,5 @@ src/
 - Place shared types in `src/lib/types.ts`.
 - Tests go in `src/__tests__/` and use Vitest with Testing Library.
 - The systemd service file (`pagerduty.service`) assumes npm is available at `/usr/bin/npm`.
+- Deployment uses a project-level `.npmrc` (with `cafile=` and `cache=/var/cache/npm-pagerduty`) so the `pagerduty` system user can run npm without a home directory.
+- Use `update.sh` to pull and rebuild the production deployment.
