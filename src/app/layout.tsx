@@ -1,10 +1,13 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
+import { headers } from "next/headers";
 import "./globals.css";
 import { ThemeProvider } from "@/components/theme-provider";
 import { ConfigProvider } from "@/contexts/config-context";
 import { IncidentProvider } from "@/contexts/incident-context";
 import { Toaster } from "@/components/ui/sonner";
+import { parseAcceptLanguage } from "@/lib/format";
+import { FormatterProvider } from "@/lib/formatter-context";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -21,11 +24,14 @@ export const metadata: Metadata = {
   description: "Monitor PagerDuty incidents for your team",
 };
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const hdrs = await headers();
+  const locale = parseAcceptLanguage(hdrs.get("accept-language"));
+
   return (
     <html
       lang="en"
@@ -34,12 +40,14 @@ export default function RootLayout({
     >
       <body className="min-h-full flex flex-col">
         <ThemeProvider>
-          <ConfigProvider>
-            <IncidentProvider>
-              {children}
-              <Toaster />
-            </IncidentProvider>
-          </ConfigProvider>
+          <FormatterProvider locale={locale}>
+            <ConfigProvider>
+              <IncidentProvider>
+                {children}
+                <Toaster />
+              </IncidentProvider>
+            </ConfigProvider>
+          </FormatterProvider>
         </ThemeProvider>
       </body>
     </html>
