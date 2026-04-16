@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { useConfig } from "@/contexts/config-context";
+import { useFormatter } from "@/lib/formatter-context";
 import type { PagerDutyAlert } from "@/lib/types";
 import { Badge } from "@/components/ui/badge";
 import { Loader2 } from "lucide-react";
@@ -12,6 +13,7 @@ interface AlertListProps {
 
 export function AlertList({ incidentId }: AlertListProps) {
   const { config } = useConfig();
+  const formatter = useFormatter();
   const [alerts, setAlerts] = useState<PagerDutyAlert[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -83,7 +85,7 @@ export function AlertList({ incidentId }: AlertListProps) {
           </div>
           <p className="mt-1 text-muted-foreground">
             {alert.service.summary} ·{" "}
-            {new Date(alert.created_at).toLocaleString()}
+            {formatter.asDateTime(alert.created_at)}
           </p>
         </div>
       ))}
