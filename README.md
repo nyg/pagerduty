@@ -46,23 +46,38 @@ A systemd unit file is included to run the dashboard as a service on Linux.
    sudo chown pagerduty:pagerduty /opt/pagerduty
    ```
 
-2. Build the app and deploy it to `/opt/pagerduty` (or update `WorkingDirectory` in the unit file):
+2. Clone the repository directly into `/opt/pagerduty`:
 
    ```bash
-   npm install
-   npm run build
-   sudo cp -r .next package.json package-lock.json /opt/pagerduty/
-   cd /opt/pagerduty && sudo -u pagerduty npm ci --omit=dev
+   sudo -u pagerduty git clone https://github.com/nyg/pagerduty.git /opt/pagerduty
    ```
 
-3. Copy your environment file:
+3. Create a project-level `.npmrc` and cache directory so the `pagerduty` user can run npm without access to your personal `~/.npmrc`:
+
+   ```bash
+   sudo mkdir -p /var/cache/npm-pagerduty
+   sudo chown pagerduty:pagerduty /var/cache/npm-pagerduty
+
+   printf 'cafile=\ncache=/var/cache/npm-pagerduty\n' | sudo -u pagerduty tee /opt/pagerduty/.npmrc > /dev/null
+   ```
+
+4. Install dependencies and build:
+
+   ```bash
+   cd /opt/pagerduty
+   sudo -u pagerduty /usr/bin/npm ci
+   sudo -u pagerduty /usr/bin/npm run build
+   sudo -u pagerduty /usr/bin/npm ci --omit=dev
+   ```
+
+5. Copy your environment file:
 
    ```bash
    sudo cp .env.local /opt/pagerduty/.env.local
    sudo chown pagerduty:pagerduty /opt/pagerduty/.env.local
    ```
 
-4. Install and start the service:
+6. Install and start the service:
 
    ```bash
    sudo cp pagerduty.service /etc/systemd/system/
@@ -71,12 +86,22 @@ A systemd unit file is included to run the dashboard as a service on Linux.
    sudo systemctl start pagerduty
    ```
 
-5. Check status and logs:
+7. Check status and logs:
 
    ```bash
    sudo systemctl status pagerduty
    journalctl -u pagerduty -f
    ```
+
+8. Update the app later:
+
+   ```bash
+   cd /opt/pagerduty
+   sudo -u pagerduty ./update.sh
+   sudo systemctl restart pagerduty
+   ```
+
+   If `git pull --ff-only` fails, resolve local changes or reset the checkout before retrying.
 
 ## Testing
 
