@@ -41,17 +41,18 @@ A systemd unit file is included to run the dashboard as a service on Linux.
 1. Create a dedicated user and install directory:
 
    ```bash
-   sudo useradd -r -m -d /home/pagerduty -s /usr/sbin/nologin pagerduty
+   sudo useradd -r -s /usr/sbin/nologin pagerduty
    sudo mkdir -p /opt/pagerduty
    sudo chown pagerduty:pagerduty /opt/pagerduty
    ```
 
-2. Clone the repository directly into `/opt/pagerduty` and build it as the `pagerduty` user:
+2. Build the app and deploy it to `/opt/pagerduty` (or update `WorkingDirectory` in the unit file):
 
    ```bash
-   sudo -u pagerduty git clone https://github.com/nyg/pagerduty.git /opt/pagerduty
-   cd /opt/pagerduty
-   sudo -u pagerduty bash -lc 'if [ -f ~/.nvm/nvm.sh ]; then source ~/.nvm/nvm.sh; fi; command -v npm >/dev/null || { echo "npm not found for pagerduty user"; exit 1; }; npm ci && npm run build && npm prune --omit=dev'
+   npm install
+   npm run build
+   sudo cp -r .next package.json package-lock.json /opt/pagerduty/
+   cd /opt/pagerduty && sudo -u pagerduty /usr/bin/npm ci --omit=dev
    ```
 
 3. Copy your environment file:
@@ -76,17 +77,6 @@ A systemd unit file is included to run the dashboard as a service on Linux.
    sudo systemctl status pagerduty
    journalctl -u pagerduty -f
    ```
-
-6. Update the app later:
-
-   ```bash
-   cd /opt/pagerduty
-   sudo -u pagerduty git pull --ff-only
-   sudo -u pagerduty bash -lc 'if [ -f ~/.nvm/nvm.sh ]; then source ~/.nvm/nvm.sh; fi; command -v npm >/dev/null || { echo "npm not found for pagerduty user"; exit 1; }; npm ci && npm run build && npm prune --omit=dev'
-   sudo systemctl restart pagerduty
-   ```
-
-   If `git pull --ff-only` fails, resolve local changes or reset the checkout before retrying.
 
 ## Testing
 
