@@ -14,7 +14,6 @@ const STORAGE_KEY = "pagerduty-config";
 
 interface ServerConfig {
   hasServerToken: boolean;
-  teamId: string;
 }
 
 interface ConfigContextValue {
@@ -57,7 +56,6 @@ export function ConfigProvider({ children }: { children: ReactNode }) {
   const [config, setConfig] = useState<AppConfig>(DEFAULT_CONFIG);
   const [serverConfig, setServerConfig] = useState<ServerConfig>({
     hasServerToken: false,
-    teamId: "",
   });
   const [mounted, setMounted] = useState(false);
 
@@ -68,10 +66,6 @@ export function ConfigProvider({ children }: { children: ReactNode }) {
       .then((res) => res.json())
       .then((data: ServerConfig) => {
         setServerConfig(data);
-        // Apply server-side teamId if client doesn't have one
-        if (data.teamId && !loaded.teamId) {
-          loaded.teamId = data.teamId;
-        }
         setConfig(loaded);
         setMounted(true);
       })

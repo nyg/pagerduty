@@ -27,8 +27,7 @@ Settings can be configured via:
 - **Settings page** (`/settings`) — API token, team, poll interval, ngrok URL (persisted in localStorage)
 - **Environment variables** (`.env.local`):
   - `PAGERDUTY_API_TOKEN` — Server-side API token (not exposed to the browser). When set, the dashboard works without configuring the token in the Settings page.
-  - `PAGERDUTY_TEAM_ID` — Server-side team ID. Used as fallback when no team is configured in the Settings page.
-  - `NEXT_PUBLIC_PAGERDUTY_TEAM_ID` — Client-side team ID (exposed to the browser, used for pre-filling the Settings page).
+  - `NEXT_PUBLIC_PAGERDUTY_TEAM_ID` — Client-side team ID (pre-fills the Settings page).
   - `NEXT_PUBLIC_NGROK_URL` — Client-side ngrok URL.
   - `NEXT_PUBLIC_POLL_INTERVAL` — Client-side poll interval in seconds (default: 30).
 
