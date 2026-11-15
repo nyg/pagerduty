@@ -15,9 +15,9 @@ A real-time dashboard for monitoring PagerDuty incidents, built with Next.js, sh
 
 ## Getting Started
 
-1. Install dependencies: `npm install`
+1. Install dependencies: `pnpm install`
 2. Configure environment (optional): `cp .env.local.example .env.local`
-3. Run the development server: `npm run dev`
+3. Run the development server: `pnpm dev`
 4. Open http://localhost:3000 and configure your settings.
 
 ## Configuration
@@ -42,10 +42,10 @@ Settings can be configured via:
 
 A systemd unit file is included to run the dashboard as a service on Linux.
 
-1. Create a dedicated user and install directory:
+1. Create a dedicated user, with a home directory for the pnpm store and cache, and an install directory:
 
    ```bash
-   sudo useradd -r -s /usr/sbin/nologin pagerduty
+   sudo useradd -r -m -d /var/lib/pagerduty -s /usr/sbin/nologin pagerduty
    sudo mkdir -p /opt/pagerduty
    sudo chown pagerduty:pagerduty /opt/pagerduty
    ```
@@ -56,22 +56,21 @@ A systemd unit file is included to run the dashboard as a service on Linux.
    sudo -u pagerduty git clone https://github.com/nyg/pagerduty.git /opt/pagerduty
    ```
 
-3. Create a project-level `.npmrc` and cache directory so the `pagerduty` user can run npm without access to your personal `~/.npmrc`:
+3. Install pnpm at `/usr/bin/pnpm` (it then runs the version set in `packageManager`), and create a project-level `.npmrc` so the `pagerduty` user can run pnpm without access to your personal `~/.npmrc`:
 
    ```bash
-   sudo mkdir -p /var/cache/npm-pagerduty
-   sudo chown pagerduty:pagerduty /var/cache/npm-pagerduty
+   sudo npm install -g pnpm
 
-   printf 'cafile=\ncache=/var/cache/npm-pagerduty\n' | sudo -u pagerduty tee /opt/pagerduty/.npmrc > /dev/null
+   printf 'cafile=\n' | sudo -u pagerduty tee /opt/pagerduty/.npmrc > /dev/null
    ```
 
 4. Install dependencies and build:
 
    ```bash
    cd /opt/pagerduty
-   sudo -u pagerduty /usr/bin/npm ci
-   sudo -u pagerduty /usr/bin/npm run build
-   sudo -u pagerduty /usr/bin/npm ci --omit=dev
+   sudo -H -u pagerduty /usr/bin/pnpm install --frozen-lockfile
+   sudo -H -u pagerduty /usr/bin/pnpm build
+   sudo -H -u pagerduty /usr/bin/pnpm install --frozen-lockfile --prod
    ```
 
 5. Copy your environment file:
@@ -101,7 +100,7 @@ A systemd unit file is included to run the dashboard as a service on Linux.
 
    ```bash
    cd /opt/pagerduty
-   sudo -u pagerduty ./update.sh
+   sudo -H -u pagerduty ./update.sh
    sudo systemctl restart pagerduty
    ```
 
@@ -109,7 +108,7 @@ A systemd unit file is included to run the dashboard as a service on Linux.
 
 ## Testing
 
-`npm test`
+`pnpm test`
 
 ## Tech Stack
 

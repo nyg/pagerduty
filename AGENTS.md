@@ -14,11 +14,11 @@ PagerDuty Incident Dashboard — a real-time dashboard for monitoring PagerDuty 
 
 ## Commands
 
-- `npm run dev` — Start development server
-- `npm run build` — Production build
-- `npm start` — Start production server
-- `npm test` — Run tests (Vitest)
-- `npm run lint` — Run ESLint
+- `pnpm dev` — Start development server
+- `pnpm build` — Production build
+- `pnpm start` — Start production server
+- `pnpm test` — Run tests (Vitest)
+- `pnpm lint` — Run ESLint
 
 ## Project Structure
 
@@ -50,7 +50,7 @@ src/
 - Place new UI primitives in `src/components/ui/`, feature components in `src/components/`.
 - Place shared types in `src/lib/types.ts`.
 - Tests go in `src/__tests__/` and use Vitest with Testing Library.
-- The systemd service file (`pagerduty.service`) assumes npm is available at `/usr/bin/npm`.
-- Deployment uses a project-level `.npmrc` (with `cafile=` and `cache=/var/cache/npm-pagerduty`) so the `pagerduty` system user can run npm without a home directory.
+- The systemd service file (`pagerduty.service`) assumes pnpm is available at `/usr/bin/pnpm`.
+- Deployment uses a project-level `.npmrc` (with `cafile=`), and the `pagerduty` system user has a home directory (`/var/lib/pagerduty`) for the pnpm store and cache. Run pnpm as that user with `sudo -H -u pagerduty`.
 - Use `update.sh` to pull and rebuild the production deployment.
 - Server-side env var `PAGERDUTY_API_TOKEN` is used by API routes and is not exposed to the browser. The `/api/config` endpoint lets the client know whether a server token is available.
