@@ -1,6 +1,6 @@
 'use client'
 
-import { useCallback, useEffect, useRef, useState } from 'react'
+import { useCallback, useEffect, useEffectEvent, useRef, useState } from 'react'
 
 import { useConfig } from '@/contexts/config-context'
 import { useIncidents } from '@/contexts/incident-context'
@@ -11,9 +11,8 @@ export function useIncidentPolling() {
    const [secondsUntilRefresh, setSecondsUntilRefresh] = useState(
       config.pollInterval
    )
-   const timerRef = useRef<ReturnType<typeof setInterval> | null>(null)
-   const countdownRef = useRef<ReturnType<typeof setInterval> | null>(null)
    const mountedRef = useRef(true)
+   const isPolling = isConfigured && !isWebhookMode
 
    const fetchIncidents = useCallback(async () => {
       if (!isConfigured) {
@@ -47,53 +46,42 @@ export function useIncidentPolling() {
       }
    }, [isConfigured, config.teamId, config.apiToken, page, pageSize, setIncidents, setLoading, setError])
 
-   const resetCountdown = useCallback(() => {
+   const refreshOnSchedule = useEffectEvent(() => {
+      fetchIncidents()
       setSecondsUntilRefresh(config.pollInterval)
-   }, [config.pollInterval])
+   })
 
    // Polling interval
    useEffect(() => {
       mountedRef.current = true
-      if (!isConfigured || isWebhookMode) {
+      if (!isPolling) {
          return
       }
 
-      // Initial fetch
-      fetchIncidents()
-      resetCountdown()
-
-      timerRef.current = setInterval(() => {
-         fetchIncidents()
-         resetCountdown()
-      }, config.pollInterval * 1000)
-
-      countdownRef.current = setInterval(() => {
+      const refreshTimer = setInterval(() => refreshOnSchedule(), config.pollInterval * 1000)
+      const countdownTimer = setInterval(() => {
          setSecondsUntilRefresh((prev) => Math.max(0, prev - 1))
       }, 1000)
 
       return () => {
          mountedRef.current = false
-         if (timerRef.current) {
-            clearInterval(timerRef.current)
-         }
-         if (countdownRef.current) {
-            clearInterval(countdownRef.current)
-         }
+         clearInterval(refreshTimer)
+         clearInterval(countdownTimer)
       }
-   }, [isConfigured, isWebhookMode, config.pollInterval, fetchIncidents, resetCountdown])
+   }, [isPolling, config.pollInterval])
 
-   // Re-fetch on page change
+   // Initial fetch, and re-fetch on page change
    useEffect(() => {
-      if (!isConfigured || isWebhookMode) {
+      if (!isPolling) {
          return
       }
       fetchIncidents()
-   }, [page, isConfigured, isWebhookMode, fetchIncidents])
+   }, [isPolling, fetchIncidents])
 
    return {
       secondsUntilRefresh,
       pollInterval: config.pollInterval,
-      isPolling: isConfigured && !isWebhookMode,
+      isPolling,
       refresh: fetchIncidents,
    }
 }
