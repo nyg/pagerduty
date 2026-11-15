@@ -34,6 +34,13 @@ async function pdFetch(
   return res;
 }
 
+function pathSegment(id: string): string {
+  if (!/^[A-Za-z0-9]+$/.test(id)) {
+    throw new PagerDutyError(400, "Invalid PagerDuty id");
+  }
+  return id;
+}
+
 export class PagerDutyError extends Error {
   constructor(
     public status: number,
@@ -125,7 +132,10 @@ export async function listAlerts(
   apiToken: string,
   incidentId: string
 ): Promise<PagerDutyAlert[]> {
-  const res = await pdFetch(`/incidents/${incidentId}/alerts`, apiToken);
+  const res = await pdFetch(
+    `/incidents/${pathSegment(incidentId)}/alerts`,
+    apiToken
+  );
   const json = await res.json();
   return json.alerts ?? [];
 }
@@ -192,7 +202,7 @@ export async function deleteWebhookSubscription(
   apiToken: string,
   subscriptionId: string
 ): Promise<void> {
-  await pdFetch(`/webhook_subscriptions/${subscriptionId}`, apiToken, {
+  await pdFetch(`/webhook_subscriptions/${pathSegment(subscriptionId)}`, apiToken, {
     method: "DELETE",
   });
 }
