@@ -1,4 +1,5 @@
 import crypto from 'crypto'
+import type { NextRequest } from 'next/server'
 import { beforeEach,describe, expect, it, vi } from 'vitest'
 
 // Mock server-only
@@ -58,7 +59,7 @@ describe('Webhook Handler', () => {
          },
       })
 
-      const req = createRequest(payload) as unknown as import('next/server').NextRequest
+      const req = createRequest(payload) as unknown as NextRequest
       const res = await POST(req)
       const json = await res.json()
 
@@ -74,7 +75,7 @@ describe('Webhook Handler', () => {
          event: { event_type: 'incident.triggered' },
       })
 
-      const req = createRequest(payload, 'v1=invalidsignature') as unknown as import('next/server').NextRequest
+      const req = createRequest(payload, 'v1=invalidsignature') as unknown as NextRequest
       const res = await POST(req)
 
       expect(res.status).toBe(401)
@@ -101,7 +102,7 @@ describe('Webhook Handler', () => {
       })
 
       const signature = signPayload(payload, secret)
-      const req = createRequest(payload, signature) as unknown as import('next/server').NextRequest
+      const req = createRequest(payload, signature) as unknown as NextRequest
       const res = await POST(req)
 
       expect(res.status).toBe(200)
@@ -112,7 +113,7 @@ describe('Webhook Handler', () => {
    })
 
    it('returns 400 for invalid JSON', async () => {
-      const req = createRequest('not json') as unknown as import('next/server').NextRequest
+      const req = createRequest('not json') as unknown as NextRequest
       const res = await POST(req)
 
       expect(res.status).toBe(400)
@@ -128,7 +129,7 @@ describe('Webhook Handler', () => {
          },
       })
 
-      const req = createRequest(payload) as unknown as import('next/server').NextRequest
+      const req = createRequest(payload) as unknown as NextRequest
       const res = await POST(req)
 
       expect(res.status).toBe(200)
@@ -149,7 +150,7 @@ describe('Webhook Handler', () => {
          },
       })
 
-      const req = createRequest(payload) as unknown as import('next/server').NextRequest
+      const req = createRequest(payload) as unknown as NextRequest
       const res = await POST(req)
 
       expect(res.status).toBe(200)
