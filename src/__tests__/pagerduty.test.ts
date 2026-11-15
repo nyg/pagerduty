@@ -177,6 +177,14 @@ describe('PagerDuty API Client', () => {
          expect(alerts).toHaveLength(1)
          expect(alerts[0].id).toBe('A1')
       })
+
+      it('rejects an incident id that is not alphanumeric', async () => {
+         await expect(
+            pd.listAlerts('test-token', '../users')
+         ).rejects.toMatchObject({ status: 400 })
+
+         expect(mockFetch).not.toHaveBeenCalled()
+      })
    })
 
    describe('listTeams', () => {
@@ -260,6 +268,14 @@ describe('PagerDuty API Client', () => {
          const [url, init] = mockFetch.mock.calls[0]
          expect(url).toContain('/webhook_subscriptions/WH1')
          expect(init.method).toBe('DELETE')
+      })
+
+      it('rejects a subscription id that is not alphanumeric', async () => {
+         await expect(
+            pd.deleteWebhookSubscription('test-token', '../users/P123')
+         ).rejects.toMatchObject({ status: 400 })
+
+         expect(mockFetch).not.toHaveBeenCalled()
       })
    })
 })
