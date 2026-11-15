@@ -5,15 +5,17 @@ import type { PagerDutyIncident } from "@/lib/types";
 
 type PermissionState = "default" | "granted" | "denied";
 
+function currentPermission(): PermissionState {
+  if (typeof Notification === "undefined") return "default";
+  return Notification.permission as PermissionState;
+}
+
 export function useNotifications() {
-  const [permission, setPermission] = useState<PermissionState>("default");
+  const [permission, setPermission] = useState(currentPermission);
   const mountedRef = useRef(true);
 
   useEffect(() => {
     mountedRef.current = true;
-    if (typeof Notification !== "undefined") {
-      setPermission(Notification.permission as PermissionState);
-    }
     return () => {
       mountedRef.current = false;
     };

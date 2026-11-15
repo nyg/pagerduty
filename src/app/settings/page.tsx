@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { ArrowLeft, Loader2, Save, Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -40,15 +40,6 @@ export default function SettingsPage() {
   const [loadingTeams, setLoadingTeams] = useState(false);
   const [saving, setSaving] = useState(false);
   const [teamError, setTeamError] = useState<string | null>(null);
-
-  // Sync form state when config changes (e.g. on mount)
-  useEffect(() => {
-    setApiToken(config.apiToken);
-    setTeamId(config.teamId);
-    setTeamName(config.teamName);
-    setNgrokUrl(config.ngrokUrl);
-    setPollInterval(String(config.pollInterval));
-  }, [config]);
 
   const fetchTeams = async () => {
     if (!apiToken) return;

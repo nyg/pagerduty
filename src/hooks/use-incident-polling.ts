@@ -55,6 +55,8 @@ export function useIncidentPolling() {
 
     // Initial fetch
     fetchIncidents();
+    // The countdown has to restart together with the timers below
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     resetCountdown();
 
     timerRef.current = setInterval(() => {
