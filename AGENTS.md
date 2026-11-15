@@ -10,7 +10,7 @@ PagerDuty Incident Dashboard — a real-time dashboard for monitoring PagerDuty 
 - **UI:** shadcn/ui components (`src/components/ui/`), Tailwind CSS v4
 - **Language:** TypeScript (strict mode)
 - **Testing:** Vitest + jsdom + Testing Library + MSW for mocking
-- **Linting:** ESLint with `eslint-config-next` (core-web-vitals + typescript)
+- **Linting:** ESLint with the shared `@nyg/eslint-config` (base + Next.js with TypeScript)
 
 ## Commands
 
